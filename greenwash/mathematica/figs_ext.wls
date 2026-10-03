@@ -20,13 +20,16 @@ seg[l_, key_] := Module[{pts = Table[{gm, val[l, gm, key]}, {gm, 0.001, 0.999, 0
    {#[[1, 2, 1]], {#[[1]], #[[2, 2]]} & /@ #} & /@ SplitBy[pts, #[[2, 1]] &]];
 eKey[r_] := r["g"] r["be"];
 ext = Map[Append[#, "e" -> #["g"] #["be"]] &, ext];
-mk5[key_, ylab_, labpos_] := Graphics[{
+mk5[key_, ylab_, labpos_, showZero_:False] := Graphics[{
     Table[{AbsoluteThickness[1.8], AbsoluteDashing[dash[[i]]],
       {If[StringTake[#[[1]], 1] == "B", blue, orange], Line[#[[2]]]} & /@ seg[lams[[i]], key]}, {i, 3}],
-    Table[Text[Style["\[Lambda]=" <> ToString[lams[[i]]], FontFamily -> "Arial", FontSize -> 14, Black], labpos[[i]]], {i, 3}]},
+    Table[Text[Style["\[Lambda]=" <> ToString[lams[[i]]], FontFamily -> "Arial", FontSize -> 14, Black], labpos[[i]]], {i, 3}],
+    If[showZero, {Text[Style["Blockchain adoption: \[Beta]g=0", FontFamily -> "Arial", FontSize -> 11, blue], {0.43, -0.0105}]}, {}]},
    Axes -> True, AxesLabel -> {Style["\[Gamma]", Italic, lblSize, Black], Style[ylab, Italic, lblSize, Black]}, AxesStyle -> Black,
-   TicksStyle -> Directive[Black, tickSize], AspectRatio -> 1/GoldenRatio, ImageSize -> 400, AxesOrigin -> {0, 0}, PlotRange -> {{0, 1.02}, {0, All}}];
+   TicksStyle -> Directive[Black, tickSize], AspectRatio -> 1/GoldenRatio, ImageSize -> 400,
+   AxesOrigin -> If[showZero, {0, -0.02}, {0, 0}],
+   PlotRange -> If[showZero, {{0, 1.02}, {-0.02, All}}, {{0, 1.02}, {0, All}}]];
 Print["configs along gamma: ", Table[DeleteDuplicates[bestCase[ev, l, #] & /@ Range[0.001, 0.999, 0.002]], {l, lams}]];
 Print["e at gamma=0.95: ", Table[val[l, 0.95, "e"], {l, lams}], "  g: ", Table[val[l, 0.95, "g"], {l, lams}], "  g at 0.3: ", Table[val[l, 0.3, "g"], {l, lams}]];
-Export[out <> "fig51.pdf", mk5["e", "\[Beta]g", {{0.9, 0.104}, {0.88, 0.157}, {0.9, 0.024}}]];
+Export[out <> "fig51.pdf", mk5["e", "\[Beta]g", {{0.9, 0.104}, {0.88, 0.157}, {0.9, 0.024}}, True]];
 Export[out <> "fig52.pdf", mk5["g", "g", {{0.3, 0.2}, {0.3, 0.333}, {0.3, 0.118}}]];
