@@ -1,0 +1,32 @@
+name: Compile IJPE manuscript
+
+on:
+  push:
+    branches:
+      - rewrite-compile-greenwash
+    paths:
+      - "greenwash/**"
+      - ".github/workflows/compile-greenwash.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out manuscript
+        uses: actions/checkout@v4
+      - name: Compile PDF
+        uses: xu-cheng/latex-action@v4
+        with:
+          root_file: main_IJPE.tex
+          working_directory: greenwash
+          args: -pdf -file-line-error -halt-on-error -interaction=nonstopmode
+      - name: Upload compiled PDF
+        uses: actions/upload-artifact@v7
+        with:
+          name: main-IJPE-pdf
+          path: greenwash/main_IJPE.pdf
+          if-no-files-found: error
