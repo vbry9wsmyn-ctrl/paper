@@ -4,13 +4,14 @@ on:
   push:
     branches:
       - rewrite-compile-greenwash
+      - claude/paper-review-j9zxzp
     paths:
       - "greenwash/**"
       - ".github/workflows/compile-greenwash.yml"
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   compile:
@@ -30,3 +31,14 @@ jobs:
           name: main-IJPE-pdf
           path: greenwash/main_IJPE.pdf
           if-no-files-found: error
+      - name: Write compiled PDF back to branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add greenwash/main_IJPE.pdf
+          if git diff --cached --quiet; then
+            echo "Compiled PDF is unchanged"
+          else
+            git commit -m "Compile rewritten IJPE manuscript"
+            git push origin HEAD:${GITHUB_REF_NAME}
+          fi
