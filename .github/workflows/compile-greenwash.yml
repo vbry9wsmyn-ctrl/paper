@@ -19,6 +19,15 @@ jobs:
     steps:
       - name: Check out manuscript
         uses: actions/checkout@v4
+      - name: Restore redrawn Figure 5(a)
+        run: |
+          encoded=greenwash/mathematica/out/fig51.pdf.b64
+          if [ -f "$encoded" ]; then
+            base64 --decode "$encoded" > /tmp/fig51-redrawn.pdf
+            cp /tmp/fig51-redrawn.pdf greenwash/Figure/fig51.pdf
+            cp /tmp/fig51-redrawn.pdf greenwash/mathematica/out/fig51.pdf
+            rm "$encoded"
+          fi
       - name: Compile PDF
         uses: xu-cheng/latex-action@v4
         with:
@@ -35,7 +44,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add greenwash/main_IJPE.pdf
+          git add greenwash/main_IJPE.pdf greenwash/Figure/fig51.pdf greenwash/mathematica/out/fig51.pdf greenwash/mathematica/out/fig51.pdf.b64
           if git diff --cached --quiet; then
             echo "Compiled PDF is unchanged"
           else
